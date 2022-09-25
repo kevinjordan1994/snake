@@ -1,0 +1,32 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --grid-size: 400px;
+  --unit-size: 40px;
+}
+
+.grid__container {
+  width: var(--grid-size);
+  height: var(--grid-size);
+  margin: 200px auto;
+  background-color: lightblue;
+  border: 2px solid blue;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+}
+
+.grid__unit {
+  width: var(--unit-size);
+  height: var(--unit-size);
+}
+
+.player {
+  width: var(--unit-size);
+  height: var(--unit-size);
+  background-color: green;
+  border-radius: 100%;
+}
