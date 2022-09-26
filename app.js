@@ -4,9 +4,9 @@ const playerElement = `<div class="player"></div>`;
 
 const playerState = {
   direction: "left",
-  size: 1,
+  snake: [1, 2],
 };
-const gameSpeed = 200;
+const gameSpeed = 300;
 
 let grid = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -14,7 +14,7 @@ let grid = [
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 2, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -31,38 +31,93 @@ function renderGrid(grid) {
       if (grid[row][collumn] === 1) {
         gridContainer.insertAdjacentHTML("beforeend", playerElement);
       }
+      if (grid[row][collumn] === 2) {
+        gridContainer.insertAdjacentHTML("beforeend", playerElement);
+      }
     }
   }
 }
 
-function movePlayer(grid, player) {
+// function movePlayer(grid, player) {
+//   for (let row = 0; row < grid.length; row++) {
+//     for (let collumn = 0; collumn < grid[row].length; collumn++) {
+//       if (grid[row][collumn] === 1) {
+//         if (player.direction === "left" && collumn > 0) {
+//           grid[row][collumn - 1] = 1;
+//           grid[row][collumn] = 0;
+//           renderGrid(grid);
+//         } else if (player.direction === "right" && collumn < 9) {
+//           grid[row][collumn + 1] = 1;
+//           grid[row][collumn] = 0;
+//           renderGrid(grid);
+//         } else if (player.direction === "up" && row > 0) {
+//           grid[row - 1][collumn] = 1;
+//           grid[row][collumn] = 0;
+//           renderGrid(grid);
+//         } else if (player.direction === "down" && row < 9) {
+//           grid[row + 1][collumn] = 1;
+//           grid[row][collumn] = 0;
+//           renderGrid(grid);
+//         }
+//       }
+//     }
+//   }
+// }
+
+function move() {
+  const movePlayer = (direction, row, collumn) => {
+    if (direction === "left" && collumn > 0) {
+      grid[row][collumn - 1] = 1;
+      grid[row][collumn] = 0;
+      return;
+    }
+    if (direction === "right" && collumn < 9) {
+      grid[row][collumn + 1] = 1;
+      grid[row][collumn] = 0;
+      return;
+    }
+    if (direction === "up" && row > 0) {
+      grid[row - 1][collumn] = 1;
+      grid[row][collumn] = 0;
+      return;
+    }
+    if (direction === "down" && row < 9) {
+      grid[row + 1][collumn] = 1;
+      grid[row][collumn] = 0;
+      return;
+    }
+  };
+
+  const findSnakePiece = (direction, coords) => {
+    if (direction === "left") return [coords[0], coords[1] + 1];
+    if (direction === "right") return [coords[0], coords[1] - 1];
+    if (direction === "up") return [coords[0] + 1, coords[1]];
+    if (direction === "down") return [coords[0] - 1, coords[1]];
+  };
+
   for (let row = 0; row < grid.length; row++) {
     for (let collumn = 0; collumn < grid[row].length; collumn++) {
       if (grid[row][collumn] === 1) {
-        if (player.direction === "left" && collumn > 0) {
-          grid[row][collumn - 1] = 1;
-          grid[row][collumn] = 0;
-          renderGrid(grid);
-          return;
-        } else if (player.direction === "right" && collumn < 9) {
-          grid[row][collumn + 1] = 1;
-          grid[row][collumn] = 0;
-          renderGrid(grid);
-          return;
-        } else if (player.direction === "up" && row > 0) {
-          grid[row - 1][collumn] = 1;
-          grid[row][collumn] = 0;
-          renderGrid(grid);
-          return;
-        } else if (player.direction === "down" && row < 9) {
-          grid[row + 1][collumn] = 1;
-          grid[row][collumn] = 0;
-          renderGrid(grid);
-          return;
+        movePlayer(playerState.direction, row, collumn);
+        previousCoords = [row, collumn];
+        for (let i = 0; i < playerState.snake; i++) {
+          let snakePieceCoords = findSnakePiece(
+            playerState.direction,
+            previousCoords
+          );
+          grid[(previousCoords[0], previousCoords[1])] = 2;
+          grid[(snakePieceCoords[0], snakePieceCoords[1])] = 0;
+          previousCoords = snakePieceCoords;
         }
+        renderGrid(grid);
+        return;
       }
     }
   }
+  //move the player head based on direction
+  //save it's coordinates
+  //loop through snake array
+  //set each unit to the previous unit coordinates
 }
 
 function changeDirection(direction) {
@@ -80,7 +135,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 function step() {
-  movePlayer(grid, playerState);
+  move();
   setTimeout(() => {
     step();
   }, gameSpeed);
